@@ -5,3 +5,14 @@ _ext
 work
 work/*
 _ext/
+\.idea/
+
+checkpoints/
+
+data/
+
+build/
+
+*.egg-info*
+
+dist/

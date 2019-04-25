@@ -411,6 +411,6 @@ im1 = a[0].numpy()[:,0,:,:].transpose(1,2,0)
 im2 = a[0].numpy()[:,1,:,:].transpose(1,2,0)
 imsave('./img1.png', im1)
 imsave('./img2.png', im2)
-flow_utils.writeFlow('./flow.flo', b[0].numpy().transpose(1,2,0))
+flow_utils.write_flow('./flow.flo', b[0].numpy().transpose(1,2,0))
 
 '''

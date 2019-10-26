@@ -1,14 +1,9 @@
 #!/usr/bin/env python2.7
 
 import caffe
-from caffe.proto import caffe_pb2
 import sys, os
 
-import torch
-import torch.nn as nn
-
 import argparse, tempfile
-import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument('caffe_model', help='input model in hdf5 or caffemodel format')
@@ -24,8 +19,8 @@ args.grads = {}
 # load models
 sys.path.append(args.flownet2_pytorch)
 
-import models
-from utils.param_utils import *
+from flownet2 import models
+from flownet2.utils.param_utils import *
 
 width = 256
 height = 256

@@ -293,14 +293,12 @@ class FlowNet2S(FlowNetS.FlowNetS):
 
 
 class FlowNet2SD(FlowNetSD.FlowNetSD):
-    def __init__(self, args, batchNorm=False, div_flow=20):
+    def __init__(self, args=None, batchNorm=False, div_flow=20):
         super(FlowNet2SD, self).__init__(args, batchNorm=batchNorm)
-        self.rgb_max = args.rgb_max
         self.div_flow = div_flow
 
     def forward(self, inputs):
-        rgb_mean = inputs.contiguous().view(inputs.size()[:2] + (-1,)).mean(dim=-1).view(inputs.size()[:2] + (1, 1, 1,))
-        x = (inputs - rgb_mean) / self.rgb_max
+        x = inputs
         x = torch.cat((x[:, :, 0, :, :], x[:, :, 1, :, :]), dim=1)
 
         out_conv0 = self.conv0(x)
@@ -342,7 +340,7 @@ class FlowNet2SD(FlowNetSD.FlowNetSD):
         if self.training:
             return flow2, flow3, flow4, flow5, flow6
         else:
-            return self.upsample1(flow2 * self.div_flow)
+            return self.upsample1(flow2 / self.div_flow)
 
 
 class FlowNet2CS(nn.Module):

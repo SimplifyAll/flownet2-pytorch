@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 TAG_CHAR = np.array([202021.25], np.float32)
 UNKNOWN_FLOW_THRESH = 1e7
@@ -30,7 +31,7 @@ def read_flow(fn):
 
 def write_flow(filename, uv, v=None):
     """ Write optical flow to file.
-    
+
     If v is None, uv is assumed to contain both u and v channels,
     stacked in depth.
     Original code by Deqing Sun, adapted from Daniel Scharstein.
@@ -60,12 +61,24 @@ def write_flow(filename, uv, v=None):
     f.close()
 
 
-def flow_to_image(flow):
+def batch_flow_to_image(batch):
+    flow_shape = list(batch.shape)
+    flow_shape[1] = 3
+    result = np.empty(flow_shape, dtype=np.uint8)
+    for i, flow in enumerate(batch):
+        np_flow = flow.data.cpu().numpy()
+        result[i, ...] = flow_to_image(np_flow)
+    return torch.tensor(result)
+
+
+def flow_to_image(flow, in_transpose=True, out_transpose=False):
     """
     Convert flow into middlebury color code image
     :param flow: optical flow map
     :return: optical flow image in middlebury color
     """
+    if in_transpose:
+        flow = np.einsum('chw->hwc', flow)
     u = flow[:, :, 0]
     v = flow[:, :, 1]
 
@@ -87,7 +100,7 @@ def flow_to_image(flow):
     rad = np.sqrt(u ** 2 + v ** 2)
     maxrad = max(-1, np.max(rad))
 
-    print("max flow: %.4f\nflow range:\nu = %.3f .. %.3f\nv = %.3f .. %.3f" % (maxrad, minu, maxu, minv, maxv))
+    # print("max flow: %.4f\nflow range:\nu = %.3f .. %.3f\nv = %.3f .. %.3f" % (maxrad, minu, maxu, minv, maxv))
 
     u = u / (maxrad + np.finfo(float).eps)
     v = v / (maxrad + np.finfo(float).eps)
@@ -96,6 +109,8 @@ def flow_to_image(flow):
 
     idx = np.repeat(idxUnknow[:, :, np.newaxis], 3, axis=2)
     img[idx] = 0
+    if out_transpose:
+        img = np.einsum('hwc->chw', img)
 
     return np.uint8(img)
 

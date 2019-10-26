@@ -6,15 +6,15 @@ from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from tensorboardX import SummaryWriter
 
-import argparse, os, sys, subprocess
+import argparse, os, subprocess
 import setproctitle, colorama
 import numpy as np
 from tqdm import tqdm
-from glob import glob
 from os.path import *
 
-import models, losses, datasets
-from utils import flow_utils, tools
+from flownet2 import models, losses, datasets
+from flownet2.utils import tools
+from flownet2.utils import flow_utils
 
 # fp32 copy of parameters for update
 global param_copy
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     parser.add_argument('--schedule_lr_frequency', type=int, default=0,
                         help='in number of iterations (0 for no schedule)')
     parser.add_argument('--schedule_lr_fraction', type=float, default=10)
-    parser.add_argument("--rgb_max", type=float, default=255.)
+    parser.add_argument("--rgb_max", type=float, default=1.)
 
     parser.add_argument('--number_workers', '-nw', '--num_workers', type=int, default=8)
     parser.add_argument('--number_gpus', '-ng', type=int, default=-1, help='number of GPUs to use')
